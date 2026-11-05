@@ -5,7 +5,7 @@ the agent's next tool call is blocked with a message telling it to stop and end 
 
 It has two parts, and you need both:
 
-- **The extension** creates the file `~/.claude/raised-hand` when you click. Clicking again while the
+- **The extension** creates the file `~/.raise-hand/raised` when you click. Clicking again while the
   hand is raised removes it.
 - **A hook** runs before each of the agent's tool calls. If the file exists, the hook deletes it and
   blocks the call.
@@ -40,7 +40,7 @@ git clone https://github.com/viridia/raise-hand.git
 cd raise-hand
 npm install
 npm run package
-code --install-extension raise-hand-0.1.0.vsix
+code --install-extension raise-hand-0.2.0.vsix
 ```
 
 `npm install` may warn about install scripts that weren't run. Packaging works anyway.
@@ -54,13 +54,13 @@ of the status bar.
 ### 2. Install the hook
 
 The hook runs before every tool call, in every project, so read
-[`hook/raise-hand.sh`](hook/raise-hand.sh) first. It's a few lines long, and only touches the flag
-file. Copy it from the `raise-hand` folder:
+[`hook/hook.sh`](hook/hook.sh) first. It's a few lines long, and only touches the flag file. Copy it
+from the `raise-hand` folder:
 
 ```sh
-mkdir -p ~/.claude
-cp hook/raise-hand.sh ~/.claude/raise-hand.sh
-chmod +x ~/.claude/raise-hand.sh
+mkdir -p ~/.raise-hand
+cp hook/hook.sh ~/.raise-hand/hook.sh
+chmod +x ~/.raise-hand/hook.sh
 ```
 
 Then add this to `~/.claude/settings.json`, merging it with anything already there. If you already
@@ -73,7 +73,7 @@ have a `PreToolUse` list, add the entry to it rather than replacing it.
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "\"$HOME\"/.claude/raise-hand.sh" }
+          { "type": "command", "command": "\"$HOME\"/.raise-hand/hook.sh" }
         ]
       }
     ]
@@ -120,7 +120,7 @@ whether the agent sees the script's message, so it may be blocked without being 
     "version": 1,
     "hooks": {
       "preToolUse": [
-        { "type": "command", "bash": "\"$HOME\"/.claude/raise-hand.sh", "timeoutSec": 5 }
+        { "type": "command", "bash": "\"$HOME\"/.raise-hand/hook.sh", "timeoutSec": 5 }
       ]
     }
   }

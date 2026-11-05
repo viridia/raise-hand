@@ -11,7 +11,7 @@ let watchers: FlagWatcher[];
 
 beforeEach(() => {
   dir = fs.mkdtempSync(path.join(os.tmpdir(), "raise-hand-"));
-  flag = path.join(dir, "raised-hand");
+  flag = path.join(dir, "raised");
   watchers = [];
 });
 
@@ -40,7 +40,7 @@ const settle = () => new Promise((resolve) => setTimeout(resolve, 200));
 
 describe("flag file", () => {
   it("uses the path the hook checks", () => {
-    assert.equal(defaultFlagPath, path.join(os.homedir(), ".claude", "raised-hand"));
+    assert.equal(defaultFlagPath, path.join(os.homedir(), ".raise-hand", "raised"));
   });
 
   it("raise creates the flag, and clear removes it", () => {
@@ -51,7 +51,7 @@ describe("flag file", () => {
   });
 
   it("raise creates a missing parent directory", () => {
-    const nested = path.join(dir, "missing", "raised-hand");
+    const nested = path.join(dir, "missing", "raised");
     raise(nested);
     assert.equal(isRaised(nested), true);
   });
@@ -150,7 +150,7 @@ describe("FlagWatcher", () => {
   });
 
   it("watches a parent directory that did not exist", async () => {
-    const nested = path.join(dir, "missing", "raised-hand");
+    const nested = path.join(dir, "missing", "raised");
     const seen: boolean[] = [];
     watch((raised) => seen.push(raised), nested);
     fs.writeFileSync(nested, "");
@@ -162,7 +162,7 @@ describe("FlagWatcher", () => {
     // A file where the parent directory should be makes the first attempt fail.
     const parent = path.join(dir, "blocked");
     fs.writeFileSync(parent, "");
-    const nested = path.join(parent, "raised-hand");
+    const nested = path.join(parent, "raised");
     const seen: boolean[] = [];
     watch((raised) => seen.push(raised), nested, 20);
     fs.rmSync(parent);

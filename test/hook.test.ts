@@ -6,7 +6,7 @@ import * as path from "node:path";
 import { afterEach, beforeEach, it } from "node:test";
 import { isRaised, raise } from "../src/flag";
 
-const script = path.join(__dirname, "..", "..", "hook", "raise-hand.sh");
+const script = path.join(__dirname, "..", "..", "hook", "hook.sh");
 
 let home: string;
 let flag: string;
@@ -18,7 +18,7 @@ function runHook() {
 
 beforeEach(() => {
   home = fs.mkdtempSync(path.join(os.tmpdir(), "raise-hand-home-"));
-  flag = path.join(home, ".claude", "raised-hand");
+  flag = path.join(home, ".raise-hand", "raised");
 });
 
 afterEach(() => {

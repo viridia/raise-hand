@@ -1,10 +1,10 @@
 // The flag file contract, with no dependency on VS Code so it can be tested directly. While the flag
-// exists, the PreToolUse hook (~/.claude/raise-hand.sh) blocks the next tool call and deletes it.
+// exists, the hook (~/.raise-hand/hook.sh) blocks the agent's next tool call and deletes it.
 import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 
-export const defaultFlagPath = path.join(os.homedir(), ".claude", "raised-hand");
+export const defaultFlagPath = path.join(os.homedir(), ".raise-hand", "raised");
 
 const WATCH_RETRY_MS = 5000;
 

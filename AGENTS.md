@@ -16,13 +16,14 @@ visible button removes the need to remember anything.
 
 ## The stopping mechanism
 
-It is installed outside this repository, and it is a file contract: **when `~/.claude/raised-hand`
-exists, the agent's next tool call is blocked.** `hook/raise-hand.sh` is the copy that other people
-install by following the README, and differs from the author's only in wording.
+It is installed outside this repository, and it is a file contract: **when `~/.raise-hand/raised`
+exists, the agent's next tool call is blocked.** `hook/hook.sh` is the source of the installed script,
+and people install it by following the README. The folder isn't under `~/.claude` because the
+extension isn't specific to Claude Code.
 
 | File | Role |
 | --- | --- |
-| `~/.claude/raise-hand.sh` | The hook. If the flag exists, deletes it, prints a stop message to stderr and exits 2. |
+| `~/.raise-hand/hook.sh` | The hook. If the flag exists, deletes it, prints a stop message to stderr and exits 2. |
 | `~/.claude/settings.json` | Runs the script as a `PreToolUse` hook, matcher `*`, in every project. |
 | `~/Library/Application Support/Code/User/keybindings.json` | Binds `ctrl+alt+h` to the command `raiseHand.toggle`. |
 
@@ -42,7 +43,7 @@ real flag yourself, and use a temporary path or `HOME` in tests.
 - A status bar item, visible in every window, that creates the flag when clicked. A click works
   wherever keyboard focus is, including inside the Claude panel.
 - The item shows when the flag is set, by watching the file, so every open window agrees. It watches
-  outside the workspace API, since `~/.claude` is usually not in the workspace.
+  outside the workspace API, since `~/.raise-hand` is not in the workspace.
 - Clicking while the flag is set clears it. A flag set when no agent is running otherwise stays set
   and stops the first tool call of the next session.
 - A command for the same action, so it can be bound to a key.
@@ -61,7 +62,7 @@ next step; the difficulty is knowing which project is meant in a multi-root work
 - Never post publicly, including publishing the extension.
 - The repository is meant to be shared, so the README is written for people who don't know this
   setup. Reports from other people belong in GitHub issues.
-- Don't change `~/.claude/` or the VS Code user configuration without asking.
+- Don't change `~/.raise-hand/`, `~/.claude/` or the VS Code user configuration without asking.
 - Propose any new dependency briefly first, and keep them few. This is a small tool, so it does not
   need a ledger structure unless the author asks for one.
 
