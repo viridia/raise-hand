@@ -1,0 +1,60 @@
+{
+  "name": "raise-hand",
+  "displayName": "Raise Hand",
+  "description": "An always-visible status bar button that stops a Claude Code agent at its next tool call.",
+  "version": "0.1.0",
+  "publisher": "viridia",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/viridia/raise-hand.git"
+  },
+  "engines": {
+    "vscode": "^1.140.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "raiseHand.toggle",
+        "title": "Raise Hand: Toggle"
+      }
+    ],
+    "icons": {
+      "raise-hand-outline": {
+        "description": "Hand, not raised",
+        "default": {
+          "fontPath": "resources/raise-hand.woff",
+          "fontCharacter": "\\E001"
+        }
+      },
+      "raise-hand-filled": {
+        "description": "Hand, raised",
+        "default": {
+          "fontPath": "resources/raise-hand.woff",
+          "fontCharacter": "\\E002"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "test": "npm run build && node --test \"out/test/**/*.test.js\"",
+    "package": "npm run build && vsce package --no-dependencies",
+    "vscode:prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/vscode": "1.140",
+    "@vscode/vsce": "^4.1.0",
+    "typescript": "^7.0.2"
+  }
+}
