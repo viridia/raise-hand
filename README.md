@@ -22,6 +22,27 @@ moment it is blocked.
 
 ## Setup
 
+The easiest way is to have your agent do it. Paste this into it:
+
+> Set up Raise Hand for me by following the Setup section of
+> https://github.com/viridia/raise-hand. Show me any change to my agent's settings before you make it.
+
+You'll need to do two things yourself at the end: reload your VS Code windows, and try the button.
+
+### Notes for agents
+
+- The steps below are written for Claude Code. If you are a different agent, install the hook using
+  your own mechanism, which must run before every tool call and be able to block it. See
+  [Other agents](#other-agents). If you have no such mechanism, say so rather than working around it.
+- Merge into the user's existing settings. Don't replace them.
+- If this machine can't run the `sh` hook, tell the user rather than improvising.
+- Don't create the real flag to test the hook, since it would block your own next tool call. Set
+  `HOME` to a temporary folder to test the script instead.
+- You can't click the button. Finish by telling the user to reload their VS Code windows, start a new
+  agent session so that the hook loads, and do step 3.
+
+### Requirements
+
 You need VS Code 1.140 or newer, Claude Code, Git, and Node 22 or newer. Node is only used to build
 the extension, and you don't need to know any JavaScript. If you don't have it, get it from
 [nodejs.org](https://nodejs.org) or through a version manager such as
@@ -80,10 +101,6 @@ have a `PreToolUse` list, add the entry to it rather than replacing it.
   }
 }
 ```
-
-Your agent can do this step for you. In Claude Code, try: "Follow step 2 of the Setup section in
-README.md. Merge the hook into my existing settings without changing anything else, and show me the
-result."
 
 ### 3. Check that it works
 
