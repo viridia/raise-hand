@@ -1,24 +1,31 @@
 # Raise Hand
 
 A VS Code status bar button that stops a coding agent so you can speak. Click **Raise hand**, and
-the agent's next tool call is blocked with a message telling it to stop and end its turn.
+the agent's tool calls are blocked with a message telling it to stop and end its turn.
 
 It has two parts, and you need both:
 
-- **The extension** creates the file `~/.raise-hand/raised` when you click. Clicking again while the
-  hand is raised removes it.
-- **A hook** runs before each of the agent's tool calls. If the file exists, the hook deletes it and
-  blocks the call.
+- **The extension** creates the file `~/.raise-hand/raised` when you click, and shows the hand's
+  state in the status bar. A click while the hand is up lowers it.
+- **A hook script** that the agent runs at two points:
+  - **Before each tool call.** The first call to find your hand raised acknowledges it and is
+    blocked. The status bar then shows **Agent stopping**. Every later call is blocked too, including
+    the rest of a batch of calls the agent made at once, and each of those tells the agent it is the
+    same raised hand.
+  - **When the agent's turn ends.** It lowers your hand.
 
 The agent needs no instructions or project files. The hook's message tells it what to do at the
 moment it is blocked.
 
 ## Limits
 
-- It takes effect at a tool call, so it can't interrupt an agent while it writes a long reply.
-- The flag is shared, so it stops whichever session makes the next tool call, in any project.
-- A hand raised while no agent is working stays raised and stops the next session's first tool call.
-  The status bar shows this, and a click clears it.
+- It takes effect at a tool call, so it can't interrupt an agent while it writes a long reply. Your
+  hand is still lowered when that reply ends, since the turn is over and you can speak.
+- The hand is shared, so it stops whichever session makes the next tool call, in any project. Any
+  session ending its turn lowers it.
+- Interrupting the agent yourself (Escape, in Claude Code) doesn't count as its turn ending, so an
+  acknowledged hand stays up and blocks the next turn's tool calls. The status bar shows this, and a
+  click lowers it.
 
 ## Setup
 
@@ -34,10 +41,15 @@ You'll need to do two things yourself at the end: reload your VS Code windows, a
 - The steps below are written for Claude Code. If you are a different agent, install the hook using
   your own mechanism, which must run before every tool call and be able to block it. See
   [Other agents](#other-agents). If you have no such mechanism, say so rather than working around it.
+- Use `pre-tool` and `turn-end` only if your agent has a hook for its turn ending. Without one,
+  nothing would lower the hand, and every tool call would be blocked until the user clicks. Run the
+  script with no argument instead, which blocks one call and lowers the hand.
 - Merge into the user's existing settings. Don't replace them.
 - If this machine can't run the `sh` hook, tell the user rather than improvising.
-- Don't create the real flag to test the hook, since it would block your own next tool call. Set
-  `HOME` to a temporary folder to test the script instead.
+- Don't create `~/.raise-hand/raised` to test the hook, since it would block your own next tool call.
+  Set `HOME` to a temporary folder to test the script instead.
+- If the user has an earlier version installed, install the new extension before the new hook.
+  Otherwise an older extension can't show an acknowledged hand.
 - You can't click the button. Finish by telling the user to reload their VS Code windows, start a new
   agent session so that the hook loads, and do step 3.
 
@@ -61,7 +73,7 @@ git clone https://github.com/viridia/raise-hand.git
 cd raise-hand
 npm install
 npm run package
-code --install-extension raise-hand-0.2.0.vsix
+code --install-extension raise-hand-0.3.0.vsix
 ```
 
 `npm install` may warn about install scripts that weren't run. Packaging works anyway.
@@ -74,9 +86,9 @@ of the status bar.
 
 ### 2. Install the hook
 
-The hook runs before every tool call, in every project, so read
-[`hook/hook.sh`](hook/hook.sh) first. It's a few lines long, and only touches the flag file. Copy it
-from the `raise-hand` folder:
+The hook runs before every tool call, in every project, so read [`hook/hook.sh`](hook/hook.sh)
+first. It's short, and only touches the two files in `~/.raise-hand`. Copy it from the `raise-hand`
+folder:
 
 ```sh
 mkdir -p ~/.raise-hand
@@ -85,7 +97,8 @@ chmod +x ~/.raise-hand/hook.sh
 ```
 
 Then add this to `~/.claude/settings.json`, merging it with anything already there. If you already
-have a `PreToolUse` list, add the entry to it rather than replacing it.
+have any of these lists, add the entries to them rather than replacing them. `Stop` runs when the
+agent's turn ends, and `StopFailure` when it ends with an API error.
 
 ```json
 {
@@ -94,7 +107,21 @@ have a `PreToolUse` list, add the entry to it rather than replacing it.
       {
         "matcher": "*",
         "hooks": [
-          { "type": "command", "command": "\"$HOME\"/.raise-hand/hook.sh" }
+          { "type": "command", "command": "\"$HOME\"/.raise-hand/hook.sh pre-tool" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "\"$HOME\"/.raise-hand/hook.sh turn-end" }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          { "type": "command", "command": "\"$HOME\"/.raise-hand/hook.sh turn-end" }
         ]
       }
     ]
@@ -109,8 +136,8 @@ have a `PreToolUse` list, add the entry to it rather than replacing it.
    summarizing it.
 3. Click **Raise hand** while it works. The item turns to **Hand raised**.
 
-At its next tool call, the agent should stop and say where things stand, and the item should return
-to normal.
+At its next tool call, the item should change to **Agent stopping**. The agent should then stop and
+say where things stand, and the item should return to normal when it finishes.
 
 ## Optional: a keyboard shortcut
 
@@ -128,7 +155,9 @@ block the call based on the result, can use it. Only Claude Code has been tested
 
 **GitHub Copilot (untested).** According to GitHub's documentation, Copilot's `preToolUse` hooks treat
 exit code 2 as a denial, so the same script should block the call. The documentation doesn't say
-whether the agent sees the script's message, so it may be blocked without being told to stop.
+whether the agent sees the script's message, so it may be blocked without being told to stop. The
+setup below runs the script with no argument, so it blocks one call and lowers the hand, because it
+doesn't use a turn-end hook.
 
 - Copilot CLI: add a JSON file to `~/.copilot/hooks/`, with this content:
 

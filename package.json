@@ -2,7 +2,7 @@
   "name": "raise-hand",
   "displayName": "Raise Hand",
   "description": "An always-visible status bar button that stops a coding agent at its next tool call.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "viridia",
   "private": true,
   "license": "MIT",
