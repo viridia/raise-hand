@@ -58,11 +58,11 @@ You'll need to do two things yourself at the end: reload your VS Code windows, a
 You need VS Code 1.140 or newer, Claude Code, Git, and Node 22 or newer. Node is only used to build
 the extension, and you don't need to know any JavaScript. If you don't have it, get it from
 [nodejs.org](https://nodejs.org) or through a version manager such as
-[nvm](https://github.com/nvm-sh/nvm).
+[nvm](https://github.com/nvm-sh/nvm). On Ubuntu, `sudo apt install nodejs npm` is enough.
 
-It has only been run on macOS. It should work on Linux. Windows would need a way to run the `sh`
-hook, which is untested. Please [open an issue](https://github.com/viridia/raise-hand/issues) to say
-how it went on either.
+It runs on macOS and Linux (tested on Ubuntu 26.04, where `/bin/sh` is `dash`). Windows would need a
+way to run the `sh` hook, which is untested. Please
+[open an issue](https://github.com/viridia/raise-hand/issues) to say how it went.
 
 ### 1. Build and install the extension
 
